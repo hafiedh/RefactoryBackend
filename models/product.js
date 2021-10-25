@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Product extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,60 +11,64 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.belongsToMany(models.Product, { through: 'Wishlists' })
-      User.hasOne(models.Store, { foreignKey: "UserId"})
+      Product.belongsTo(models.Store, { foreignKey: 'StoreId' })
+      Product.belongsToMany(models.User, { through: 'Wishlists' })
     }
   };
-  User.init({
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-      validate: {
-        isEmail: { msg: "Wrong Format Email" },
-        notNull: {
-          msg: "Email is required"
-        },
-        notEmpty: {
-          msg: "Email cant be empty"
-        }
-      }
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: {
-          args: [8, 25],
-          msg: "Min password length is 8"
-        },
-        notNull: {
-          msg: "Password is required"
-        },
-        notEmpty: {
-          msg: "Password cant be empty"
-        }
-      }
-    },
-    username: {
+  Product.init({
+    StoreId: DataTypes.INTEGER,
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notNull: {
-          msg: "Username is required"
+          msg: "Name is required"
         },
         notEmpty: {
-          msg: "Username cant be empty"
+          msg: "Name cant be empty"
         }
       }
     },
-    fullname: DataTypes.STRING,
-    phoneNumber: DataTypes.STRING,
-    imgUrl: DataTypes.STRING,
-    address: DataTypes.STRING,
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "Type is required"
+        },
+        notEmpty: {
+          msg: "Type cant be empty"
+        }
+      }
+    },
+    stock: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "Stock is required"
+        },
+        notEmpty: {
+          msg: "Stock cant be empty"
+        }
+      }
+    },
+    imgUrl: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "Image is required"
+        },
+        notEmpty: {
+          msg: "Image cant be empty"
+        }
+      }
+    },
+    description: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'User',
+    modelName: 'Product',
   });
-  return User;
+  return Product;
 };
