@@ -7,9 +7,13 @@ class UserController {
         try {
             let { email, password, username, fullname, phoneNumber, imgUrl, address } = req.body;
             const result = await User.create({ email, password, username, fullname, phoneNumber, imgUrl, address });
-            res.status(201).json(result)
+            res.status(201).json({
+                username: result.username,
+                email: result.email,
+                id: result.id
+            })
         } catch (err) {
-            console.log(err);
+            next(err)
         }
     }
 
@@ -22,25 +26,31 @@ class UserController {
                 }
             })
             if (!currentUser) {
-                throw 'WRONG EMAIL/PASSWORD CUK'
+                throw {
+                    name: 'authentication',
+                    message: 'Wrong email/password'
+                }
             }
             const isPasswordValid = decode(password, currentUser.password)
             if (isPasswordValid) {
-                const token = sign({
+                const access_token = sign({
                     email,
                     password
                 })
                 res.status(200).json({
-                    accessToken: token,
+                    id: currentUser.id,
+                    access_token,
                     email,
                     username: currentUser.username
                 })
             } else {
-                throw 'WRONG PASSWORD'
+                throw {
+                    name: 'authentication',
+                    message: 'Wrong email/password'
+                }
             }
-            console.log(currentUser);
-        } catch (error) {
-            console.log(error)
+        } catch (err) {
+            next(err)
         }
     }
 
