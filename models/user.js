@@ -1,4 +1,5 @@
 'use strict';
+const { encode } = require('../helpers/bcryct')
 const {
   Model
 } = require('sequelize');
@@ -12,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.belongsToMany(models.Product, { through: 'Wishlists' })
-      User.hasOne(models.Store, { foreignKey: "UserId"})
+      User.hasOne(models.Store, { foreignKey: "UserId" })
     }
   };
   User.init({
@@ -63,6 +64,11 @@ module.exports = (sequelize, DataTypes) => {
     imgUrl: DataTypes.STRING,
     address: DataTypes.STRING,
   }, {
+    hooks: {
+      beforeCreate(user) {
+        user.password = encode(user.password)
+      }
+    },
     sequelize,
     modelName: 'User',
   });
