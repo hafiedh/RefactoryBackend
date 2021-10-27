@@ -43,6 +43,10 @@ class UserController {
             console.log(error)
         }
     }
+
+    static async forgetPassword(req, res, next) {
+
+    }
 }
 
 module.exports = UserController
