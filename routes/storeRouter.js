@@ -6,5 +6,6 @@ router.use(authentication);
 
 router.get('/', StoreController.getStore);
 router.post('/', StoreController.createStore);
+router.put('/:id', StoreController.editStore);
 
 module.exports = router;
