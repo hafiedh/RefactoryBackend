@@ -1,6 +1,7 @@
 const { User } = require('../models');
 const { decode } = require('../helpers/bcryct')
 const { sign } = require('../helpers/jwt')
+const sendEmail = require('../helpers/nodemailer')
 
 class UserController {
     static async register(req, res, next) {
@@ -37,6 +38,7 @@ class UserController {
                     email,
                     password
                 })
+                sendEmail("hafiedhmuh@gmail.com")
                 res.status(200).json({
                     id: currentUser.id,
                     access_token,
