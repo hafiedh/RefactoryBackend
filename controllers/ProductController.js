@@ -13,11 +13,11 @@ class ProductContoller {
 
     static async createProduct(req, res, next) {
         try {
-            let { storeId, name, type, stock, imgUrl, description } = req.body;
-            const result = await Product.create({ storeId, name, type, stock, imgUrl, description });
+            let { StoreId, name, type, stock, imgUrl, description } = req.body;
+            const result = await Product.create({ StoreId, name, type, stock, imgUrl, description });
             res.status(201).json({
                 name: result.name,
-                storeId: result.storeId,
+                storeId: result.StoreId,
                 type: result.type,
                 stock: result.stock,
                 imgUrl: result.imgUrl,
