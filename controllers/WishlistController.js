@@ -1,12 +1,12 @@
-const { Wishlist } = require('../models');
+const { Wishlist, User, Product } = require('../models');
 
 class WishlistController {
     static async Wishlists(req, res, next) {
         try {
             const { id } = req.user;
 
-            const result = await Wishlist.findAll({
-                where: { UserId: id }
+            const result = await User.findByPk(id, {
+                include: [ Product ]
             })
 
             res.status(200).json(result)
@@ -19,8 +19,7 @@ class WishlistController {
     static async createWishlist(req, res, next) {
         try {
             const { id: UserId } = req.user;
-            const { quantity } = req.body;
-            const { id: ProductId } = req.params;
+            const { quantity, ProductId } = req.body;
 
             const result = await Wishlist.create({ UserId, quantity, ProductId })
 

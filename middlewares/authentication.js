@@ -2,7 +2,7 @@ const { verify } = require('../helpers/jwt');
 const { User } = require('../models');
 
 async function authentication(req, res, next) {
-    const token = req.headers.access_token; 
+    const token = req.headers.access_token;
 
     try {
         const payload = verify(token);
@@ -12,14 +12,14 @@ async function authentication(req, res, next) {
                 email: payload.email
             }
         })
-  
+
         if (!foundUser) {
             throw {
                 name: "authentication",
                 message: "User Not Found"
             }
         }
-        
+
         req.user = {
             id: foundUser.id,
             email: foundUser.email
