@@ -55,7 +55,11 @@ class UserController {
     }
 
     static async forgetPassword(req, res, next) {
+        try {
 
+        } catch (error) {
+
+        }
     }
 }
 
