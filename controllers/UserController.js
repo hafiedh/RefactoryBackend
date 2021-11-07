@@ -1,6 +1,7 @@
 const { User } = require('../models');
-const { decode } = require('../helpers/bcryct')
-const { sign } = require('../helpers/jwt')
+const { decode } = require('../helpers/bcryct');
+const { sign } = require('../helpers/jwt');
+const fetchGoogleUser = require('../helpers/googleAuth');
 
 class UserController {
     static async register(req, res, next) {
@@ -59,6 +60,32 @@ class UserController {
 
         } catch (error) {
 
+        }
+    }
+
+    static async googleLogin(req, res, next) {
+        try {
+            let idToken = req.body.idToken;
+            let payload = await fetchGoogleUser(idToken);
+            let { email, name } = payload;
+
+            let user = await User.findOrCreate({
+                where: { email },
+                defaults: {
+                    username: name,
+                    email,
+                    password: "12345"
+                }
+            })
+            let access_token = sign({ id: user[0].id, email: user[0].email });
+            req.headers.access_token = access_token;
+            res.status(200).json({ 
+                access_token,
+                username: user[0].username,
+                userId: user[0].id
+            });
+        } catch (err) {
+            next(err);
         }
     }
 }

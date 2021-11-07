@@ -9,5 +9,6 @@ router.get('/', (req, res) => {
 router.post('/register', UserController.register)
 router.post('/login', UserController.login)
 router.post('/forgot-password', UserController.forgetPassword)
+router.post('/login-google', UserController.googleLogin)
 
 module.exports = router;
