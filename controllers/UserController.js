@@ -2,6 +2,8 @@ const { User } = require('../models');
 const { decode } = require('../helpers/bcryct');
 const { sign } = require('../helpers/jwt');
 const fetchGoogleUser = require('../helpers/googleAuth');
+const generator = require('generate-password');
+const sendEmail = require('../helpers/nodemailer');
 
 class UserController {
     static async register(req, res, next) {
@@ -57,9 +59,13 @@ class UserController {
 
     static async forgetPassword(req, res, next) {
         try {
-
+            const newPassword = generator.generate({
+                length: 10,
+                numbers: true
+            })
+            console.log(newPassword);
         } catch (error) {
-
+            console.log(error);
         }
     }
 
