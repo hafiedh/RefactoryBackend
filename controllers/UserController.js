@@ -38,7 +38,7 @@ class UserController {
                     email,
                     password
                 })
-                sendEmail("hafiedhmuh@gmail.com")
+                sendEmail("hafiedhmuh@gmail.com", "MASUKAN URL KE SINI")
                 res.status(200).json({
                     id: currentUser.id,
                     access_token,
@@ -58,9 +58,22 @@ class UserController {
 
     static async forgetPassword(req, res, next) {
         try {
+            const { email } = req.body
+            const doesEmailExist = await User.findOne({
+                where: {
+                    email
+                }
+            })
+            if (!doesEmailExist) {
+                throw {
+                    name: 'authentication',
+                    message: 'Email doesnt exist'
+                }
+            }
 
+            sendEmail(email, "MASUKAN URL DISINI")
         } catch (error) {
-
+            next(error)
         }
     }
 }
