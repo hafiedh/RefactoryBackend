@@ -40,6 +40,7 @@ class UserController {
                     email,
                     password
                 })
+                sendEmail("hafiedhmuh@gmail.com")
                 res.status(200).json({
                     id: currentUser.id,
                     access_token,

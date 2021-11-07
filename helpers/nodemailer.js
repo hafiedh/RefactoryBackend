@@ -3,17 +3,17 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: '<email cataza>',
-        pass: '<password email cataza>'
+        user: 'indonesiacatazas@gmail.com',
+        pass: 'catazasindo123'
     }
 })
 
 function sendEmail(email) {
     const options = {
-        from: "'MeatBox' <no-reply@gmail.com>",
+        from: "'Catazas' <no-reply@gmail.com>",
         to: email,
-        subject: "Pesanan MeatBox",
-        text: "Pesanan Anda sedang dalam perjalanan"
+        subject: "Testingx",
+        text: "test"
     };
 
     transporter.sendMail(options, (err, info) => {
