@@ -1,7 +1,9 @@
 const { User } = require('../models');
-const { decode } = require('../helpers/bcryct')
-const { sign } = require('../helpers/jwt')
-const sendEmail = require('../helpers/nodemailer')
+const { decode } = require('../helpers/bcryct');
+const { sign } = require('../helpers/jwt');
+const fetchGoogleUser = require('../helpers/googleAuth');
+const generator = require('generate-password');
+const sendEmail = require('../helpers/nodemailer');
 
 class UserController {
     static async register(req, res, next) {
@@ -58,6 +60,7 @@ class UserController {
 
     static async forgetPassword(req, res, next) {
         try {
+<<<<<<< HEAD
             const { email } = req.body
             const doesEmailExist = await User.findOne({
                 where: {
@@ -74,6 +77,41 @@ class UserController {
             sendEmail(email, "MASUKAN URL DISINI")
         } catch (error) {
             next(error)
+=======
+            const newPassword = generator.generate({
+                length: 10,
+                numbers: true
+            })
+            console.log(newPassword);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    static async googleLogin(req, res, next) {
+        try {
+            let idToken = req.body.idToken;
+            let payload = await fetchGoogleUser(idToken);
+            let { email, name } = payload;
+
+            let user = await User.findOrCreate({
+                where: { email },
+                defaults: {
+                    username: name,
+                    email,
+                    password: "12345"
+                }
+            })
+            let access_token = sign({ id: user[0].id, email: user[0].email });
+            req.headers.access_token = access_token;
+            res.status(200).json({ 
+                access_token,
+                username: user[0].username,
+                userId: user[0].id
+            });
+        } catch (err) {
+            next(err);
+>>>>>>> 673ed42e15fce1ae9a1b6377f5b6c14624696fb3
         }
     }
 }
