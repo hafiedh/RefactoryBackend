@@ -3,7 +3,8 @@ const { decode } = require('../helpers/bcryct');
 const { sign } = require('../helpers/jwt');
 const fetchGoogleUser = require('../helpers/googleAuth');
 const generator = require('generate-password');
-const sendEmail = require('../helpers/nodemailer');
+const { sendEmail, sendEmailForgotPassword } = require('../helpers/nodemailer');
+const { Op } = require("sequelize");
 
 class UserController {
     static async register(req, res, next) {
@@ -22,12 +23,24 @@ class UserController {
 
     static async login(req, res, next) {
         try {
-            const { email, password } = req.body
+            const { emailOrUsername, password } = req.body
             const currentUser = await User.findOne({
                 where: {
-                    email
+                    [Op.or]: [
+                        {
+                            email: {
+                                [Op.eq]: emailOrUsername
+                            }
+                        },
+                        {
+                            username: {
+                                [Op.eq]: emailOrUsername
+                            }
+                        }
+                    ]
                 }
             })
+            console.log(currentUser.password)
             if (!currentUser) {
                 throw {
                     name: 'authentication',
@@ -35,16 +48,16 @@ class UserController {
                 }
             }
             const isPasswordValid = decode(password, currentUser.password)
+            console.log(isPasswordValid)
             if (isPasswordValid) {
                 const access_token = sign({
-                    email,
+                    email: emailOrUsername,
                     password
                 })
-                sendEmail("hafiedhmuh@gmail.com", "MASUKAN URL KE SINI")
                 res.status(200).json({
                     id: currentUser.id,
                     access_token,
-                    email,
+                    email: emailOrUsername,
                     username: currentUser.username
                 })
             } else {
@@ -60,7 +73,6 @@ class UserController {
 
     static async forgetPassword(req, res, next) {
         try {
-<<<<<<< HEAD
             const { email } = req.body
             const doesEmailExist = await User.findOne({
                 where: {
@@ -73,18 +85,23 @@ class UserController {
                     message: 'Email doesnt exist'
                 }
             }
-
-            sendEmail(email, "MASUKAN URL DISINI")
-        } catch (error) {
-            next(error)
-=======
             const newPassword = generator.generate({
                 length: 10,
                 numbers: true
             })
-            console.log(newPassword);
+            await User.update(
+                { password: newPassword },
+                {
+                    where: { email }
+                }
+            )
+            sendEmailForgotPassword("hafiedhmuh@gmail.com", newPassword)
+            res.status(201).json({
+                status: "ok",
+                message: "Email has been sent. Check your email"
+            })
         } catch (error) {
-            console.log(error);
+            next(error)
         }
     }
 
@@ -104,14 +121,13 @@ class UserController {
             })
             let access_token = sign({ id: user[0].id, email: user[0].email });
             req.headers.access_token = access_token;
-            res.status(200).json({ 
+            res.status(200).json({
                 access_token,
                 username: user[0].username,
                 userId: user[0].id
             });
         } catch (err) {
             next(err);
->>>>>>> 673ed42e15fce1ae9a1b6377f5b6c14624696fb3
         }
     }
 }

@@ -20,9 +20,24 @@ function sendEmail(email, url) {
         if (err) {
             console.log(err);
         } else {
-            console.log('berhasil');
+            console.log('Success');
         }
     })
 }
 
-module.exports = sendEmail;
+function sendEmailForgotPassword(email, newPassword) {
+    const options = {
+        from: "'Catazas' <no-reply@gmail.com>",
+        to: email,
+        subject: "Reset Password",
+        text: "Your new password is" + newPassword
+    };
+    transporter.sendMail(options, (err, info) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log('Success');
+        }
+    })
+}
+module.exports = { sendEmail, sendEmailForgotPassword };
