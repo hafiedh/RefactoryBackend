@@ -95,13 +95,21 @@ class UserController {
                     where: { email }
                 }
             )
-            sendEmailForgotPassword("hafiedhmuh@gmail.com", newPassword)
+            sendEmailForgotPassword(email, newPassword)
             res.status(201).json({
                 status: "ok",
                 message: "Email has been sent. Check your email"
             })
         } catch (error) {
             next(error)
+        }
+    }
+
+    static async verify(req, res, next) {
+        try {
+
+        } catch (err) {
+            next(err)
         }
     }
 
