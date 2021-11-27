@@ -1,6 +1,6 @@
 function errorHandler(err, req, res, next ) {
     let code = 500;
-    let message = ['Internal server error']
+    let message = err.message || ['Internal server error']
 
     switch (err.name) {
         case "SequelizeValidationError":
@@ -15,6 +15,8 @@ function errorHandler(err, req, res, next ) {
             message = [err.message];
             res.status(code).json({ code, message });
             break;
+        case "update":
+            code = 400;
         default:
             res.status(code).json({ code, message });
             break;
