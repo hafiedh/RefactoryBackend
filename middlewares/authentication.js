@@ -1,15 +1,26 @@
 const { verify } = require('../helpers/jwt');
 const { User } = require('../models');
+const { Op } = require("sequelize");
 
 async function authentication(req, res, next) {
     const token = req.headers.access_token;
 
     try {
         const payload = verify(token);
-
         const foundUser = await User.findOne({
             where: {
-                email: payload.email
+                [Op.or]: [
+                    {
+                        email: {
+                            [Op.eq]: payload.emailOrUsername
+                        }
+                    },
+                    {
+                        username: {
+                            [Op.eq]: payload.emailOrUsername
+                        }
+                    }
+                ]
             }
         })
 

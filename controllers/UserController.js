@@ -40,7 +40,7 @@ class UserController {
                     ]
                 }
             })
-            console.log(currentUser.password)
+
             if (!currentUser) {
                 throw {
                     name: 'authentication',
@@ -48,10 +48,9 @@ class UserController {
                 }
             }
             const isPasswordValid = decode(password, currentUser.password)
-            console.log(isPasswordValid)
             if (isPasswordValid) {
                 const access_token = sign({
-                    email: emailOrUsername,
+                    emailOrUsername,
                     password
                 })
                 res.status(200).json({
@@ -95,7 +94,7 @@ class UserController {
                     where: { email }
                 }
             )
-            sendEmailForgotPassword("hafiedhmuh@gmail.com", newPassword)
+            sendEmailForgotPassword("arsyadrama7@gmail.com", newPassword)
             res.status(201).json({
                 status: "ok",
                 message: "Email has been sent. Check your email"
@@ -128,6 +127,35 @@ class UserController {
             });
         } catch (err) {
             next(err);
+        }
+    }
+
+    static async updateProfile(req, res, next) {
+        try {
+            const { username, fullname, phoneNumber, imgUrl, address } = req.body;
+            const { id, email } = req.user;
+
+            const currentUser = await User.findOne({ 
+                where: { id, email },
+                attributes: ['username', 'fullname', 'phoneNumber', 'imgUrl', 'address' ]
+            })
+
+            const isDataChanged = JSON.stringify(currentUser) === JSON.stringify({ username, fullname, phoneNumber, imgUrl, address })
+            if (isDataChanged) {
+                throw {
+                    name: 'update',
+                    message: 'No Changes'
+                }
+            }
+
+            const updatedUser = await User.update({ username, fullname, phoneNumber, imgUrl, address }, {
+                where: { id, email },
+                returning: true
+            })
+            
+            res.status(200).json({ status: 200, message: 'Your profile is updated'})
+        } catch (err) {
+            next(err)
         }
     }
 }
