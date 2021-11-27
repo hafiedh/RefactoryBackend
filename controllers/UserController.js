@@ -94,7 +94,7 @@ class UserController {
                     where: { email }
                 }
             )
-            sendEmailForgotPassword("arsyadrama7@gmail.com", newPassword)
+            sendEmailForgotPassword(email, newPassword)
             res.status(201).json({
                 status: "ok",
                 message: "Email has been sent. Check your email"

@@ -16,9 +16,11 @@ class ProductContoller {
             const { id } = req.params;
 
             const product = await Product.findByPk(id, {
-                include: [ Store ]
+                include: [Store]
             })
+
             res.status(200).json(product)
+
         } catch (err) {
             console.log(err);
             next(err)
@@ -30,12 +32,10 @@ class ProductContoller {
             const { id } = req.params;
             const { name, type, price, stock, imgUrl, description } = req.body;
             // const { id: StoreId } = req.store; >> SETELAH AUTHENTIKASI
-
             const result = await Product.update({ name, type, price, stock, imgUrl, description }, {
                 where: { id },
                 returning: true
             })
-
             res.status(200).json(result[1][0])
         } catch (err) {
             console.log(err);
@@ -65,7 +65,7 @@ class ProductContoller {
         try {
             const { id } = req.params;
 
-            await Product.destroy({ where: { id }})
+            await Product.destroy({ where: { id } })
             res.status(200).json({
                 message: "Product deleted"
             })
