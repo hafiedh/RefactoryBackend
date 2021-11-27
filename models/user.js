@@ -67,6 +67,11 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       beforeCreate(user) {
         user.password = encode(user.password)
+      },
+      beforeBulkUpdate(user) {
+        if (user.attributes.password.length < 25) {
+          user.attributes.password = encode(user.attributes.password)
+        }
       }
     },
     sequelize,

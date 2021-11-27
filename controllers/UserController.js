@@ -1,5 +1,5 @@
 const { User } = require('../models');
-const { decode } = require('../helpers/bcryct');
+const { decode, encode } = require('../helpers/bcryct');
 const { sign } = require('../helpers/jwt');
 const fetchGoogleUser = require('../helpers/googleAuth');
 const generator = require('generate-password');
@@ -23,7 +23,7 @@ class UserController {
 
     static async login(req, res, next) {
         try {
-            const { emailOrUsername, password } = req.body
+            const { emailOrUsername, password } = req.body;
             const currentUser = await User.findOne({
                 where: {
                     [Op.or]: [
@@ -84,17 +84,18 @@ class UserController {
                     message: 'Email doesnt exist'
                 }
             }
-            const newPassword = generator.generate({
+            let newPassword = generator.generate({
                 length: 10,
                 numbers: true
             })
+
             await User.update(
                 { password: newPassword },
                 {
                     where: { email }
                 }
             )
-            sendEmailForgotPassword("arsyadrama7@gmail.com", newPassword)
+            sendEmailForgotPassword(email, newPassword)
             res.status(201).json({
                 status: "ok",
                 message: "Email has been sent. Check your email"
@@ -152,7 +153,7 @@ class UserController {
                 where: { id, email },
                 returning: true
             })
-            
+
             res.status(200).json({ status: 200, message: 'Your profile is updated'})
         } catch (err) {
             next(err)
