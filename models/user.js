@@ -10,11 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      // define association here
-      User.belongsToMany(models.Product, { through: 'Wishlists' })
-      User.hasOne(models.Store, { foreignKey: "UserId" })
-    }
+
   };
   User.init({
     email: {
@@ -67,6 +63,11 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       beforeCreate(user) {
         user.password = encode(user.password)
+      },
+      beforeBulkUpdate(user) {
+        if (user.attributes.password.length < 25) {
+          user.attributes.password = encode(user.attributes.password)
+        }
       }
     },
     sequelize,

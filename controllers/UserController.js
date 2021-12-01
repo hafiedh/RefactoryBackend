@@ -1,5 +1,5 @@
 const { User } = require('../models');
-const { decode } = require('../helpers/bcryct');
+const { decode, encode } = require('../helpers/bcryct');
 const { sign } = require('../helpers/jwt');
 const fetchGoogleUser = require('../helpers/googleAuth');
 const generator = require('generate-password');
@@ -23,7 +23,7 @@ class UserController {
 
     static async login(req, res, next) {
         try {
-            const { emailOrUsername, password } = req.body
+            const { emailOrUsername, password } = req.body;
             const currentUser = await User.findOne({
                 where: {
                     [Op.or]: [
@@ -84,10 +84,11 @@ class UserController {
                     message: 'Email doesnt exist'
                 }
             }
-            const newPassword = generator.generate({
+            let newPassword = generator.generate({
                 length: 10,
                 numbers: true
             })
+
             await User.update(
                 { password: newPassword },
                 {
@@ -104,11 +105,38 @@ class UserController {
         }
     }
 
-    static async verify(req, res, next) {
+    static async updatePassword(req, res, next) {
         try {
+            const { id, email } = req.user;
+            const { oldPassword, newPassword, confirmPassword } = req.body;
+            const ispasswordSame = newPassword === confirmPassword
+            if (!ispasswordSame) {
+                throw {
+                    name: 'confirm password',
+                    message: 'new passwor or confirm password not same'
+                }
+            }
+            const currentUserPassword = await User.findOne({
+                where: { id, email },
+                attributes: ['password']
+            })
 
-        } catch (err) {
-            next(err)
+            const passwordValid = decode(oldPassword, currentUserPassword)
+            if (!passwordValid) {
+                throw {
+                    name: 'password',
+                    message: 'Password not same'
+                }
+            }
+            const updatedUser = await User.update({
+                password: newPassword
+            }, {
+                where: { id, email },
+                returning: true
+            })
+            res.status(200).json({ status: 200, message: 'Your password is updated' })
+        } catch (error) {
+            next(error)
         }
     }
 
@@ -138,34 +166,6 @@ class UserController {
         }
     }
 
-    static async updateProfile(req, res, next) {
-        try {
-            const { username, fullname, phoneNumber, imgUrl, address } = req.body;
-            const { id, email } = req.user;
-
-            const currentUser = await User.findOne({
-                where: { id, email },
-                attributes: ['username', 'fullname', 'phoneNumber', 'imgUrl', 'address']
-            })
-
-            const isDataChanged = JSON.stringify(currentUser) === JSON.stringify({ username, fullname, phoneNumber, imgUrl, address })
-            if (isDataChanged) {
-                throw {
-                    name: 'update',
-                    message: 'No Changes'
-                }
-            }
-
-            const updatedUser = await User.update({ username, fullname, phoneNumber, imgUrl, address }, {
-                where: { id, email },
-                returning: true
-            })
-
-            res.status(200).json({ status: 200, message: 'Your profile is updated' })
-        } catch (err) {
-            next(err)
-        }
-    }
 }
 
 module.exports = UserController

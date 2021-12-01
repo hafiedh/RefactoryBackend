@@ -30,7 +30,7 @@ function sendEmailForgotPassword(email, newPassword) {
         from: "'Catazas' <no-reply@gmail.com>",
         to: email,
         subject: "Reset Password",
-        text: "Your new password is" + newPassword
+        text: "Your new password is: " + newPassword
     };
     transporter.sendMail(options, (err, info) => {
         if (err) {
